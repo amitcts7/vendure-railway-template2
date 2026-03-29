@@ -6,7 +6,7 @@ import {
 } from '@vendure/core';
 import { defaultEmailHandlers, EmailPlugin } from '@vendure/email-plugin';
 import { AssetServerPlugin, configureS3AssetStorage } from '@vendure/asset-server-plugin';
-import { AdminUiPlugin } from '@vendure/admin-ui-plugin';
+import { DashboardPlugin } from '@vendure/dashboard/plugin';
 import 'dotenv/config';
 import path from 'path';
 
@@ -121,9 +121,9 @@ export const config: VendureConfig = {
                 changeEmailAddressUrl: 'http://localhost:8080/verify-email-address-change'
             },
         }),
-        AdminUiPlugin.init({
+        DashboardPlugin.init({
             route: 'admin',
-            port: 3002,
+            appDir: path.join(__dirname, 'dashboard'),
         }),
     ],
 };

@@ -1,6 +1,6 @@
 import { populate } from '@vendure/core/cli';
 import { bootstrap, VendureConfig } from '@vendure/core';
-import { createConnection } from 'typeorm';
+import { DataSource } from 'typeorm';
 import path from 'path';
 
 /**
@@ -33,8 +33,9 @@ export async function populateOnFirstRun(config: VendureConfig) {
 }
 
 async function tablesExist(config: VendureConfig) {
-    const connection = await createConnection(config.dbConnectionOptions);
-    const result = await connection.query(`
+    const dataSource = new DataSource(config.dbConnectionOptions as any);
+    await dataSource.initialize();
+    const result = await dataSource.query(`
         select n.nspname as table_schema,
                c.relname as table_name,
                c.reltuples as rows
@@ -44,6 +45,6 @@ async function tablesExist(config: VendureConfig) {
               and n.nspname = '${process.env.DB_SCHEMA}'
         order by c.reltuples desc;`
     );
-    await connection.close();
+    await dataSource.destroy();
     return 0 < result.length;
 }

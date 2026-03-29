@@ -1,5 +1,6 @@
 node_modules
 dist
+.vendure-dashboard-temp
 static/assets
 static/email/test-emails
 .idea
