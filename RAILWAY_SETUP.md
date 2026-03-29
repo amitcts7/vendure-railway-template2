@@ -96,9 +96,25 @@ MINIO_SECRET_KEY=
 
 ## Part 4 — Set a Public Domain
 
-1. Click the server service → **"Settings"** tab → **"Networking"**
-2. Click **"Generate Domain"**
-3. Railway assigns a URL like `vendure-xxxxx.up.railway.app`
+Railway's UI has two ways to generate a public domain depending on the version you see:
+
+**Option A — From the service overview (newer UI)**
+1. Click on your **Vendure server service** card
+2. Look for the **"+ Add"** button or a **globe / network icon** near the top of the service panel
+3. Click it and select **"Generate Domain"** or **"Custom Domain"**
+
+**Option B — From Settings (older UI)**
+1. Click the server service → **"Settings"** tab
+2. Scroll down to the **"Networking"** or **"Public Networking"** section
+3. Click **"Generate Domain"**
+
+**Option C — From the service card directly (current UI)**
+1. On the project canvas, hover over the **server service card**
+2. Click the **three-dot menu (⋮)** in the top-right corner of the card
+3. Select **"Generate Domain"**
+
+Once generated, Railway assigns a URL like `vendure-xxxxx.up.railway.app`
+
 4. Visit `https://your-domain.up.railway.app` — you will be redirected to `/admin`
 5. Log in with `superadmin` / your chosen password
 

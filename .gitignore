@@ -1,5 +1,12 @@
 node_modules
-dist
+
+# Compiled TypeScript output (built in Dockerfile)
+dist/*.js
+dist/src/
+
+# Dashboard is pre-built by GitHub Actions and committed
+# dist/dashboard/ is intentionally NOT ignored
+
 .vendure-dashboard-temp
 static/assets
 static/email/test-emails

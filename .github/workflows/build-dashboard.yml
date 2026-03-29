@@ -1,0 +1,40 @@
+name: Build React Dashboard
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'src/**'
+      - 'vite.config.mts'
+      - 'package.json'
+      - 'package-lock.json'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build React Dashboard
+        run: npx vite build
+
+      - name: Commit built dashboard
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f dist/dashboard
+          git diff --staged --quiet || git commit -m "chore: pre-build React dashboard [skip ci]"
+          git push

@@ -8,10 +8,9 @@ RUN npm install
 
 COPY . .
 
-# Step 1: compile TypeScript (fast, ~30s)
+# Compile TypeScript only (~30 seconds)
+# The React dashboard (dist/dashboard/) is pre-built by GitHub Actions
+# and committed to the repo — no vite build needed here
 RUN npx tsc
-
-# Step 2: build React dashboard (slow, ~5-10min on first run)
-RUN npx vite build
 
 CMD ["node", "./dist/index.js"]
