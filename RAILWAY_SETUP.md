@@ -40,47 +40,55 @@ git push origin master
 4. Click the PostgreSQL service → **"Variables"** tab to see the auto-generated variables:
 
 ```
-DATABASE_URL
-PGHOST
-PGPORT
 PGDATABASE
-PGUSER
+PGHOST
 PGPASSWORD
+PGPORT
+PGUSER
+DATABASE_URL
 ```
 
-> Keep this tab open — you will reference `DATABASE_URL` in the next step.
+> You will reference these using Railway reference variable syntax
+> (`${{Postgres.VARIABLE_NAME}}`) in the next step.
 
 ---
 
 ## Part 3 — Configure the Server Service Variables
 
 1. Click your **Vendure server service** (the GitHub service) → **"Variables"** tab
-2. Add each variable below — click **"+ New Variable"** for each:
+2. Click **"+ New Variable"** for each variable below:
 
 ### Required variables
 
-| Variable | Value |
-|---|---|
-| `APP_ENV` | `production` |
-| `COOKIE_SECRET` | click **Generate** or paste any random 32-char string |
-| `SUPERADMIN_USERNAME` | `superadmin` |
-| `SUPERADMIN_PASSWORD` | your chosen admin password |
-| `DB_URL` | `${{Postgres.DATABASE_URL}}` |
-| `DB_SCHEMA` | `public` |
-| `RUN_JOB_QUEUE_FROM_SERVER` | `true` |
+```env
+DB_NAME=${{Postgres.PGDATABASE}}
+DB_USERNAME=${{Postgres.PGUSER}}
+DB_PASSWORD=${{Postgres.PGPASSWORD}}
+DB_HOST=${{Postgres.PGHOST}}
+DB_PORT=${{Postgres.PGPORT}}
+DB_SCHEMA=public
+ASSET_UPLOAD_DIR=/vendure-assets
+COOKIE_SECRET=<add some random characters>      # required — keep secret
+SUPERADMIN_USERNAME=superadmin
+SUPERADMIN_PASSWORD=<create some strong password>  # required — keep secret
+APP_ENV=production
+RUN_JOB_QUEUE_FROM_SERVER=true
+```
 
-> For `DB_URL`, type exactly `${{Postgres.DATABASE_URL}}` — Railway resolves
-> this to the real PostgreSQL connection URL at runtime.
+> **`${{Postgres.VARIABLE_NAME}}`** is Railway's reference variable syntax.
+> Railway automatically resolves it to the real value from the linked
+> PostgreSQL service at runtime. Type it exactly as shown above.
 
 ### Optional variables (S3 / MinIO asset storage)
 
-| Variable | Value |
-|---|---|
-| `MINIO_ENDPOINT` | your MinIO or S3 endpoint URL |
-| `MINIO_ACCESS_KEY` | your access key |
-| `MINIO_SECRET_KEY` | your secret key |
+```env
+MINIO_ENDPOINT=                    # e.g. https://minio.example.com
+MINIO_ACCESS_KEY=
+MINIO_SECRET_KEY=
+```
 
-> Leave these blank to use local filesystem storage inside the container.
+> Leave these blank to use local filesystem storage inside the container
+> (path set by `ASSET_UPLOAD_DIR` above).
 
 3. Click **"Deploy"** to redeploy with the new variables.
 
@@ -115,17 +123,21 @@ production workloads. Skip this step for simple/demo deployments
    ```
 5. Click the worker service → **"Variables"** tab and add:
 
-| Variable | Value |
-|---|---|
-| `APP_ENV` | `production` |
-| `COOKIE_SECRET` | same value as the server |
-| `SUPERADMIN_USERNAME` | same value as the server |
-| `SUPERADMIN_PASSWORD` | same value as the server |
-| `DB_URL` | `${{Postgres.DATABASE_URL}}` |
-| `DB_SCHEMA` | `public` |
-| `RUN_JOB_QUEUE_FROM_SERVER` | `false` |
+```env
+DB_NAME=${{Postgres.PGDATABASE}}
+DB_USERNAME=${{Postgres.PGUSER}}
+DB_PASSWORD=${{Postgres.PGPASSWORD}}
+DB_HOST=${{Postgres.PGHOST}}
+DB_PORT=${{Postgres.PGPORT}}
+DB_SCHEMA=public
+COOKIE_SECRET=<same value as server>
+SUPERADMIN_USERNAME=superadmin
+SUPERADMIN_PASSWORD=<same value as server>
+APP_ENV=production
+RUN_JOB_QUEUE_FROM_SERVER=false
+```
 
-6. Also update the **server service**: set `RUN_JOB_QUEUE_FROM_SERVER` to `false`
+6. Also update the **server service**: change `RUN_JOB_QUEUE_FROM_SERVER` to `false`
 7. Go to the worker service → **"Settings"** → **"Networking"** → disable **"Public Networking"**
    (the worker does not need a public URL)
 
@@ -149,8 +161,8 @@ Click the service → **"Logs"** tab (live logs)
 |---|---|
 | `No Vendure tables found in DB. Populating database...` | First run — normal, wait 2–3 min |
 | `Vendure server listening on port` | Server started successfully ✓ |
-| `Error: connect ECONNREFUSED` | `DB_URL` not set or PostgreSQL not linked |
-| `password authentication failed` | Wrong database credentials |
+| `Error: connect ECONNREFUSED` | DB vars not set or PostgreSQL not linked |
+| `password authentication failed` | Wrong `DB_PASSWORD` value |
 | `relation does not exist` | Migrations haven't run yet |
 
 ---
@@ -166,7 +178,7 @@ Once your deployment is working:
    - **Name:** `Vendure v3.5.5`
    - **Description:** `Vendure e-commerce backend with React Dashboard, PostgreSQL, and optional worker service`
    - **Services:** select server + PostgreSQL (+ worker if added)
-5. Mark the following as **required variables** (users must set these):
+5. Mark the following as **required variables** (users must set these on deploy):
    - `COOKIE_SECRET`
    - `SUPERADMIN_PASSWORD`
 6. Click **"Publish"** — Railway generates a public template URL
@@ -199,28 +211,52 @@ Once your deployment is working:
 
 ## All Environment Variables Reference
 
+### Server service
+
 ```env
-# ── App ──────────────────────────────────────────────────
-APP_ENV=production
-PORT=3000                          # Set automatically by Railway
+# ── Database (Railway reference variables) ───────────────
+DB_NAME=${{Postgres.PGDATABASE}}
+DB_USERNAME=${{Postgres.PGUSER}}
+DB_PASSWORD=${{Postgres.PGPASSWORD}}
+DB_HOST=${{Postgres.PGHOST}}
+DB_PORT=${{Postgres.PGPORT}}
+DB_SCHEMA=public
+
+# ── Assets ───────────────────────────────────────────────
+ASSET_UPLOAD_DIR=/vendure-assets
 
 # ── Auth ─────────────────────────────────────────────────
-COOKIE_SECRET=<random-32-char-string>
+COOKIE_SECRET=<add some random characters>
 SUPERADMIN_USERNAME=superadmin
-SUPERADMIN_PASSWORD=<strong-password>
+SUPERADMIN_PASSWORD=<create some strong password>
 
-# ── Database ─────────────────────────────────────────────
-DB_URL=${{Postgres.DATABASE_URL}}  # Railway reference variable
-DB_SCHEMA=public
+# ── App ──────────────────────────────────────────────────
+APP_ENV=production
+PORT=3000                           # set automatically by Railway
 
 # ── Job Queue ─────────────────────────────────────────────
 # true  = server runs job queue (single service, simpler)
 # false = separate worker service runs job queue
 RUN_JOB_QUEUE_FROM_SERVER=true
 
-# ── Asset Storage (optional — leave blank for local) ──────
-ASSET_UPLOAD_DIR=
+# ── S3 / MinIO (optional) ─────────────────────────────────
 MINIO_ENDPOINT=
 MINIO_ACCESS_KEY=
 MINIO_SECRET_KEY=
+```
+
+### Worker service (if used)
+
+```env
+DB_NAME=${{Postgres.PGDATABASE}}
+DB_USERNAME=${{Postgres.PGUSER}}
+DB_PASSWORD=${{Postgres.PGPASSWORD}}
+DB_HOST=${{Postgres.PGHOST}}
+DB_PORT=${{Postgres.PGPORT}}
+DB_SCHEMA=public
+COOKIE_SECRET=<same value as server>
+SUPERADMIN_USERNAME=superadmin
+SUPERADMIN_PASSWORD=<same value as server>
+APP_ENV=production
+RUN_JOB_QUEUE_FROM_SERVER=false
 ```
