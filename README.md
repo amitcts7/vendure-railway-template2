@@ -1,7 +1,9 @@
 # Vendure One-Click Deploy
 
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/your-template-id)
+
 This is a repo which can be used by "one click deploy" features of cloud hosts in order to rapidly set
-up a Vendure instance that is populated with test data.
+up a **Vendure v3.5.5** instance populated with test data, including the new **React Dashboard**.
 
 ---
 
@@ -34,7 +36,15 @@ the `src` directory.
 npm run build
 ```
 
-will compile the TypeScript sources into the `/dist` directory.
+will compile the TypeScript sources into the `/dist` directory **and** build the React Dashboard
+into `/dist/dashboard`. The dashboard build introspects the Vendure config and may take a few
+minutes on first run.
+
+To rebuild only the dashboard:
+
+```
+npm run build:dashboard
+```
 
 ## Production
 
