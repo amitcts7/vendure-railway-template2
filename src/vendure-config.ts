@@ -2,6 +2,7 @@ import {
     dummyPaymentHandler,
     DefaultJobQueuePlugin,
     DefaultSearchPlugin,
+    LanguageCode,
     VendureConfig,
 } from '@vendure/core';
 import { defaultEmailHandlers, EmailPlugin } from '@vendure/email-plugin';
@@ -79,6 +80,7 @@ export const config: VendureConfig = {
         Product: [{
             name: 'test',
             type: 'string',
+            label: [{ languageCode: LanguageCode.en, value: 'Test' }],
         }]
     },
     plugins: [
