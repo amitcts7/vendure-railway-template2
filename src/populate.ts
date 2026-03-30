@@ -35,16 +35,15 @@ export async function populateOnFirstRun(config: VendureConfig) {
 async function tablesExist(config: VendureConfig) {
     const dataSource = new DataSource(config.dbConnectionOptions as any);
     await dataSource.initialize();
-    const result = await dataSource.query(`
-        select n.nspname as table_schema,
-               c.relname as table_name,
-               c.reltuples as rows
-        from pg_class c
-        join pg_namespace n on n.oid = c.relnamespace
-        where c.relkind = 'r'
-              and n.nspname = '${process.env.DB_SCHEMA}'
-        order by c.reltuples desc;`
+    const schema = process.env.DB_SCHEMA || 'public';
+    const result = await dataSource.query(
+        `SELECT EXISTS (
+            SELECT FROM pg_tables
+            WHERE schemaname = $1
+            AND tablename = 'channel'
+        ) AS "exists";`,
+        [schema]
     );
     await dataSource.destroy();
-    return 0 < result.length;
+    return result[0].exists === true || result[0].exists === 'true';
 }
