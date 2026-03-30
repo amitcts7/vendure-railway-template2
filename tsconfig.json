@@ -12,10 +12,14 @@
     "sourceMap": false,
     "skipLibCheck": true,
     "rootDir": "./src",
-    "outDir": "./dist",
-    "baseUrl": "./"
+    "outDir": "./dist"
   },
-  "exclude": ["node_modules", "migration.ts", "vite.config.mts", "src/vendure-config.dashboard.ts"],
+  "exclude": [
+    "node_modules",
+    "migration.ts",
+    "src/plugins/**/dashboard/*",
+    "vite.*.*ts"
+  ],
   "ts-node": {
     "files": true
   }

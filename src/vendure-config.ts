@@ -123,7 +123,7 @@ export const config: VendureConfig = {
         }),
         DashboardPlugin.init({
             route: 'dashboard',
-            appDir: path.join(__dirname, 'dashboard'),
+            appDir: path.join(__dirname, '../dist/dashboard'),
         }),
     ],
 };

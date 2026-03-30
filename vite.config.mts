@@ -1,27 +1,17 @@
-import { defineConfig } from 'vite';
 import { vendureDashboardPlugin } from '@vendure/dashboard/vite';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import { join } from 'path';
+import { pathToFileURL } from 'url';
+import { defineConfig } from 'vite';
 
 export default defineConfig({
+    base: '/dashboard',
+    build: {
+        outDir: join(process.cwd(), 'dist/dashboard'),
+    },
     plugins: [
         vendureDashboardPlugin({
-            vendureConfigPath: './src/vendure-config.dashboard.ts',
-            vendureConfigExport: 'config',
-            module: 'commonjs',
-            tempCompilationDir: path.join(__dirname, '.vendure-dashboard-temp'),
-            pluginPackageScanner: {
-                packageGlobs: [],
-            },
-            disablePlugins: {
-                gqlTada: true,
-            },
+            vendureConfigPath: pathToFileURL('./src/vendure-config.ts'),
+            api: { host: 'http://localhost', port: 3000 },
         }),
     ],
-    build: {
-        outDir: path.join(__dirname, 'dist/dashboard'),
-        emptyOutDir: true,
-    },
 });
