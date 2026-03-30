@@ -106,21 +106,37 @@ export const config: VendureConfig = {
         }),
         DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),
         DefaultSearchPlugin.init({ bufferUpdates: false, indexStockStatus: true }),
-        EmailPlugin.init({
+        ...(IS_DEV ? [EmailPlugin.init({
             devMode: true,
             outputPath: path.join(__dirname, '../static/email/test-emails'),
             route: 'mailbox',
             handlers: defaultEmailHandlers,
             templatePath: path.join(__dirname, '../static/email/templates'),
             globalTemplateVars: {
-                // The following variables will change depending on your storefront implementation.
-                // Here we are assuming a storefront running at http://localhost:8080.
                 fromAddress: '"example" <noreply@example.com>',
                 verifyEmailAddressUrl: 'http://localhost:8080/verify',
                 passwordResetUrl: 'http://localhost:8080/password-reset',
                 changeEmailAddressUrl: 'http://localhost:8080/verify-email-address-change'
             },
-        }),
+        })] : [EmailPlugin.init({
+            transport: {
+                type: 'smtp',
+                host: process.env.SMTP_HOST || 'localhost',
+                port: +(process.env.SMTP_PORT || 587),
+                auth: process.env.SMTP_USER ? {
+                    user: process.env.SMTP_USER,
+                    pass: process.env.SMTP_PASS,
+                } : undefined,
+            },
+            handlers: defaultEmailHandlers,
+            templatePath: path.join(__dirname, '../static/email/templates'),
+            globalTemplateVars: {
+                fromAddress: process.env.EMAIL_FROM || '"example" <noreply@example.com>',
+                verifyEmailAddressUrl: `${process.env.STOREFRONT_URL || 'http://localhost:8080'}/verify`,
+                passwordResetUrl: `${process.env.STOREFRONT_URL || 'http://localhost:8080'}/password-reset`,
+                changeEmailAddressUrl: `${process.env.STOREFRONT_URL || 'http://localhost:8080'}/verify-email-address-change`
+            },
+        })]),
         DashboardPlugin.init({
             route: 'dashboard',
             appDir: path.join(__dirname, '../dist/dashboard'),
