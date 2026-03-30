@@ -17,11 +17,6 @@ jobs:
 
     env:
       NODE_OPTIONS: --max-old-space-size=4096
-      LOG: true
-      # Set this in GitHub repo Settings → Secrets and variables → Actions → Variables
-      # Value: your Railway domain e.g. https://vendure-xxxxx.up.railway.app
-      VENDURE_API_HOST: ${{ vars.VENDURE_API_HOST }}
-      VENDURE_API_PORT: ${{ vars.VENDURE_API_PORT || '443' }}
 
     steps:
       - name: Checkout
