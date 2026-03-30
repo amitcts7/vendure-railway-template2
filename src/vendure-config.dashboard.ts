@@ -1,24 +1,16 @@
 /**
- * This file is used ONLY by vite.config.mts to build the React dashboard.
- * It is a stripped-down version of vendure-config.ts that:
- *  - Excludes DashboardPlugin (avoids circular dependency during build)
- *  - Excludes S3/MinIO config (not needed for schema introspection)
- *  - Uses hardcoded stubs for env vars (build-time only, not used at runtime)
+ * Minimal config for vite dashboard build — NO imports.
  *
- * Keep customFields and plugins in sync with vendure-config.ts so the
- * dashboard schema reflects the real server configuration.
+ * The vite plugin's internal TypeScript compiler follows all static imports
+ * into node_modules (allowJs: true), causing multi-hour compile times.
+ * By having zero imports here, TypeScript compiles this file in milliseconds.
+ *
+ * The vite plugin loads @vendure/core itself for schema generation —
+ * it does NOT need us to import it here.
+ *
+ * Keep customFields in sync with vendure-config.ts.
  */
-import {
-    dummyPaymentHandler,
-    DefaultJobQueuePlugin,
-    DefaultSearchPlugin,
-    VendureConfig,
-} from '@vendure/core';
-import { defaultEmailHandlers, EmailPlugin } from '@vendure/email-plugin';
-import { AssetServerPlugin } from '@vendure/asset-server-plugin';
-import path from 'path';
-
-export const config: VendureConfig = {
+export const config = {
     apiOptions: {
         port: 3000,
         adminApiPath: 'admin-api',
@@ -31,7 +23,7 @@ export const config: VendureConfig = {
             password: 'superadmin',
         },
         cookieOptions: {
-            secret: 'build-time-secret',
+            secret: 'build-time-only',
         },
     },
     dbConnectionOptions: {
@@ -46,34 +38,14 @@ export const config: VendureConfig = {
         password: 'password',
     },
     paymentOptions: {
-        paymentMethodHandlers: [dummyPaymentHandler],
+        paymentMethodHandlers: [],
     },
-    // Keep customFields in sync with vendure-config.ts
+    // Keep in sync with vendure-config.ts
     customFields: {
         Product: [{
             name: 'test',
             type: 'string',
-        }]
+        }],
     },
-    plugins: [
-        AssetServerPlugin.init({
-            route: 'assets',
-            assetUploadDir: path.join(__dirname, '../static/assets'),
-        }),
-        DefaultJobQueuePlugin.init({ useDatabaseForBuffer: true }),
-        DefaultSearchPlugin.init({ bufferUpdates: false, indexStockStatus: true }),
-        EmailPlugin.init({
-            devMode: true,
-            outputPath: path.join(__dirname, '../static/email/test-emails'),
-            route: 'mailbox',
-            handlers: defaultEmailHandlers,
-            templatePath: path.join(__dirname, '../static/email/templates'),
-            globalTemplateVars: {
-                fromAddress: '"example" <noreply@example.com>',
-                verifyEmailAddressUrl: 'http://localhost:8080/verify',
-                passwordResetUrl: 'http://localhost:8080/password-reset',
-                changeEmailAddressUrl: 'http://localhost:8080/verify-email-address-change',
-            },
-        }),
-    ],
+    plugins: [],
 };
