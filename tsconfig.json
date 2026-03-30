@@ -15,7 +15,7 @@
     "outDir": "./dist",
     "baseUrl": "./"
   },
-  "exclude": ["node_modules", "migration.ts", "vite.config.mts"],
+  "exclude": ["node_modules", "migration.ts", "vite.config.mts", "src/vendure-config.dashboard.ts"],
   "ts-node": {
     "files": true
   }
