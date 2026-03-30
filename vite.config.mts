@@ -8,15 +8,21 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
     plugins: [
         vendureDashboardPlugin({
-            // Use the dashboard-specific config that excludes DashboardPlugin
-            // itself — avoids circular dependency and speeds up the build.
             vendureConfigPath: './src/vendure-config.dashboard.ts',
             vendureConfigExport: 'config',
             module: 'commonjs',
             tempCompilationDir: path.join(__dirname, '.vendure-dashboard-temp'),
             pluginPackageScanner: {
-                // No custom npm plugins in this template — skip the scan
                 packageGlobs: [],
+            },
+            // Disable the slow schema introspection steps.
+            // This template has no custom dashboard extensions so
+            // compile-time schema typing is not needed.
+            disablePlugins: {
+                configLoader: true,
+                adminApiSchema: true,
+                gqlTada: true,
+                dashboardMetadata: true,
             },
         }),
     ],
