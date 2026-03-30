@@ -218,7 +218,7 @@ Once your deployment is working:
 
 | URL | Description |
 |---|---|
-| `/admin` | React Dashboard (admin UI) |
+| `/dashboard` | React Dashboard (admin UI) |
 | `/admin-api` | Admin GraphQL API |
 | `/shop-api` | Storefront GraphQL API |
 | `/assets` | Asset server |

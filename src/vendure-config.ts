@@ -21,7 +21,7 @@ export const config: VendureConfig = {
             {
               handler: (_req: any, res: any, next: any) => {
                 if (_req.path === '/') {
-                  return res.redirect('/admin');
+                  return res.redirect('/dashboard');
                 }
                 next();
               },
@@ -122,7 +122,7 @@ export const config: VendureConfig = {
             },
         }),
         DashboardPlugin.init({
-            route: 'admin',
+            route: 'dashboard',
             appDir: path.join(__dirname, 'dashboard'),
         }),
     ],
