@@ -13,4 +13,4 @@ COPY . .
 # and committed to the repo — no vite build needed here
 RUN npx tsc
 
-CMD ["node", "./dist/index.js"]
+CMD ["node", "--no-deprecation", "./dist/index.js"]
