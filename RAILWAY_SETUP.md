@@ -26,9 +26,10 @@ git push origin master
 3. Authorize Railway to access your GitHub account if prompted
 4. Select your repository → click **Deploy Now**
 
-> **Note:** The first deploy triggers a GitHub Actions workflow that builds
-> the React Dashboard (~5-10 min on Linux). Railway then runs only `tsc`
-> in Docker (~30 seconds). Subsequent deploys are fast.
+> **Note:** This template uses **Railpack** — Railway's native builder.
+> Railway runs `npm install` + `npm run build` (`tsc` only, ~30 seconds).
+> The React Dashboard (`dist/dashboard/`) is pre-built by GitHub Actions
+> and committed to the repo — no slow dashboard build runs on Railway.
 
 ---
 
@@ -261,7 +262,7 @@ Once your deployment is working:
 | Server | `node ./dist/index.js` | Yes — `/dashboard`, `/admin-api`, `/shop-api` |
 | Worker | `node ./dist/index-worker.js` | No |
 | PostgreSQL | managed by Railway | No |
-| MinIO (optional) | managed by Railway | Optional (console on port 9001) |
+| MinIO (optional) | `server /data --console-address ":9001"` | Optional (console on port 9001) |
 
 ## Available Endpoints (after deploy)
 
