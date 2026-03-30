@@ -12,6 +12,12 @@ export default defineConfig({
             vendureConfigExport: 'config',
             module: 'commonjs',
             tempCompilationDir: path.join(__dirname, '.vendure-dashboard-temp'),
+            // Skip scanning npm packages for dashboard extensions.
+            // This template has no custom npm plugins — scanning all of
+            // node_modules takes hours and produces nothing useful.
+            pluginPackageScanner: {
+                packageGlobs: [],
+            },
         }),
     ],
     build: {
