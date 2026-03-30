@@ -1,11 +1,5 @@
 # Vendure One-Click Deploy
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/your-template-id)
-
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/s3cyGH?referralCode=Sjix63&utm_medium=integration&utm_source=template&utm_campaign=generic)
-
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/SHCsSv?referralCode=Sjix63&utm_medium=integration&utm_source=template&utm_campaign=generic)
-
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/TalGvY?referralCode=Sjix63&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
 This is a repo which can be used by "one click deploy" features of cloud hosts in order to rapidly set
