@@ -10,7 +10,7 @@
  *
  * Keep customFields in sync with vendure-config.ts.
  */
-export const config = {
+export const config: import('@vendure/core').VendureConfig = {
     apiOptions: {
         port: 3000,
         adminApiPath: 'admin-api',
