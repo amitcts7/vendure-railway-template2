@@ -15,14 +15,8 @@ export default defineConfig({
             pluginPackageScanner: {
                 packageGlobs: [],
             },
-            // Disable the slow schema introspection steps.
-            // This template has no custom dashboard extensions so
-            // compile-time schema typing is not needed.
             disablePlugins: {
-                configLoader: true,
-                adminApiSchema: true,
                 gqlTada: true,
-                dashboardMetadata: true,
             },
         }),
     ],
