@@ -26,9 +26,9 @@ git push origin master
 3. Authorize Railway to access your GitHub account if prompted
 4. Select your repository → click **Deploy Now**
 
-> **Note:** The build takes **5–15 minutes** on first deploy. Railway runs
-> `npm run build` inside Docker which compiles TypeScript and builds the
-> React Dashboard (the `vite build` step introspects the Vendure config).
+> **Note:** The first deploy triggers a GitHub Actions workflow that builds
+> the React Dashboard (~5-10 min on Linux). Railway then runs only `tsc`
+> in Docker (~30 seconds). Subsequent deploys are fast.
 
 ---
 
@@ -67,8 +67,7 @@ DB_PASSWORD=${{Postgres.PGPASSWORD}}
 DB_HOST=${{Postgres.PGHOST}}
 DB_PORT=${{Postgres.PGPORT}}
 DB_SCHEMA=public
-ASSET_UPLOAD_DIR=/vendure-assets
-COOKIE_SECRET=<add some random characters>      # required — keep secret
+COOKIE_SECRET=<add some random characters>         # required — keep secret
 SUPERADMIN_USERNAME=superadmin
 SUPERADMIN_PASSWORD=<create some strong password>  # required — keep secret
 APP_ENV=production
@@ -79,16 +78,64 @@ RUN_JOB_QUEUE_FROM_SERVER=true
 > Railway automatically resolves it to the real value from the linked
 > PostgreSQL service at runtime. Type it exactly as shown above.
 
-### Optional variables (S3 / MinIO asset storage)
+### Asset storage — choose ONE option
+
+#### Option A — Railway Volume (simple, good for demos)
+
+1. In your Railway project, click **"+ New"** → **"Volume"**
+2. Attach it to the server service
+3. Set mount path to `/vendure-assets`
+4. Add this variable to the server service:
 
 ```env
-MINIO_ENDPOINT=                    # e.g. https://minio.example.com
-MINIO_ACCESS_KEY=
-MINIO_SECRET_KEY=
+ASSET_UPLOAD_DIR=/vendure-assets
 ```
 
-> Leave these blank to use local filesystem storage inside the container
-> (path set by `ASSET_UPLOAD_DIR` above).
+Assets are stored on the volume and persist across redeploys.
+
+#### Option B — MinIO (self-hosted S3-compatible, recommended for production)
+
+MinIO is an open-source S3-compatible object storage server. You can run it
+as a Railway service or use any hosted MinIO/S3 instance.
+
+Add these variables to the server service:
+
+```env
+ASSET_UPLOAD_DIR=                          # leave blank when using MinIO
+MINIO_ENDPOINT=https://your-minio-host     # e.g. https://minio.example.com
+MINIO_ACCESS_KEY=your-minio-access-key
+MINIO_SECRET_KEY=your-minio-secret-key
+```
+
+**MinIO on Railway:**
+1. Click **"+ New"** → **"Docker Image"**
+2. Use image: `minio/minio`
+3. Set start command: `server /data --console-address ":9001"`
+4. Add environment variables to the MinIO service:
+   ```env
+   MINIO_ROOT_USER=minioadmin
+   MINIO_ROOT_PASSWORD=<strong-password>
+   ```
+5. Add a Volume to MinIO service, mount at `/data`
+6. Create a bucket named `vendure-assets` via the MinIO console (port 9001)
+7. Reference MinIO variables in the server service:
+   ```env
+   MINIO_ENDPOINT=http://${{minio.RAILWAY_PRIVATE_DOMAIN}}:9000
+   MINIO_ACCESS_KEY=${{minio.MINIO_ROOT_USER}}
+   MINIO_SECRET_KEY=${{minio.MINIO_ROOT_PASSWORD}}
+   ```
+
+#### Option C — AWS S3 / Cloudflare R2
+
+```env
+ASSET_UPLOAD_DIR=                          # leave blank when using S3/R2
+MINIO_ENDPOINT=https://your-r2-or-s3-endpoint
+MINIO_ACCESS_KEY=your-access-key-id
+MINIO_SECRET_KEY=your-secret-access-key
+```
+
+> Cloudflare R2 and AWS S3 both work with the S3-compatible storage strategy
+> already configured in this template.
 
 3. Click **"Deploy"** to redeploy with the new variables.
 
@@ -115,7 +162,7 @@ Railway's UI has two ways to generate a public domain depending on the version y
 
 Once generated, Railway assigns a URL like `vendure-xxxxx.up.railway.app`
 
-4. Visit `https://your-domain.up.railway.app` — you will be redirected to `/admin`
+4. Visit `https://your-domain.up.railway.app` — you will be redirected to `/dashboard`
 5. Log in with `superadmin` / your chosen password
 
 > On **first startup**, the server detects an empty database and automatically
@@ -180,6 +227,7 @@ Click the service → **"Logs"** tab (live logs)
 | `Error: connect ECONNREFUSED` | DB vars not set or PostgreSQL not linked |
 | `password authentication failed` | Wrong `DB_PASSWORD` value |
 | `relation does not exist` | Migrations haven't run yet |
+| `ENOENT: no such file or directory` on assets | `ASSET_UPLOAD_DIR` not set or volume not mounted |
 
 ---
 
@@ -210,9 +258,10 @@ Once your deployment is working:
 
 | Service | Start command | Public URL |
 |---|---|---|
-| Server | `node ./dist/index.js` | Yes — `/admin`, `/admin-api`, `/shop-api` |
+| Server | `node ./dist/index.js` | Yes — `/dashboard`, `/admin-api`, `/shop-api` |
 | Worker | `node ./dist/index-worker.js` | No |
 | PostgreSQL | managed by Railway | No |
+| MinIO (optional) | managed by Railway | Optional (console on port 9001) |
 
 ## Available Endpoints (after deploy)
 
@@ -222,6 +271,7 @@ Once your deployment is working:
 | `/admin-api` | Admin GraphQL API |
 | `/shop-api` | Storefront GraphQL API |
 | `/assets` | Asset server |
+| `/mailbox` | Dev email inbox (dev mode only) |
 
 ---
 
@@ -238,9 +288,6 @@ DB_HOST=${{Postgres.PGHOST}}
 DB_PORT=${{Postgres.PGPORT}}
 DB_SCHEMA=public
 
-# ── Assets ───────────────────────────────────────────────
-ASSET_UPLOAD_DIR=/vendure-assets
-
 # ── Auth ─────────────────────────────────────────────────
 COOKIE_SECRET=<add some random characters>
 SUPERADMIN_USERNAME=superadmin
@@ -255,10 +302,16 @@ PORT=3000                           # set automatically by Railway
 # false = separate worker service runs job queue
 RUN_JOB_QUEUE_FROM_SERVER=true
 
-# ── S3 / MinIO (optional) ─────────────────────────────────
-MINIO_ENDPOINT=
-MINIO_ACCESS_KEY=
-MINIO_SECRET_KEY=
+# ── Asset Storage ─────────────────────────────────────────
+# Option A: Railway Volume
+ASSET_UPLOAD_DIR=/vendure-assets    # must match volume mount path
+
+# Option B: MinIO / S3 / Cloudflare R2
+# When MINIO_ENDPOINT is set, ASSET_UPLOAD_DIR is ignored
+ASSET_UPLOAD_DIR=                   # leave blank
+MINIO_ENDPOINT=https://your-minio-or-s3-endpoint
+MINIO_ACCESS_KEY=your-access-key
+MINIO_SECRET_KEY=your-secret-key
 ```
 
 ### Worker service (if used)
