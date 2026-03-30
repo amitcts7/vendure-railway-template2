@@ -2,7 +2,6 @@ import {
     dummyPaymentHandler,
     DefaultJobQueuePlugin,
     DefaultSearchPlugin,
-    LanguageCode,
     VendureConfig,
 } from '@vendure/core';
 import { defaultEmailHandlers, EmailPlugin } from '@vendure/email-plugin';
@@ -73,15 +72,6 @@ export const config: VendureConfig = {
     },
     paymentOptions: {
         paymentMethodHandlers: [dummyPaymentHandler],
-    },
-    // When adding or altering custom field definitions, the database will
-    // need to be updated. See the "Migrations" section in README.md.
-    customFields: {
-        Product: [{
-            name: 'test',
-            type: 'string',
-            label: [{ languageCode: LanguageCode.en, value: 'Test' }],
-        }]
     },
     plugins: [
         AssetServerPlugin.init({
