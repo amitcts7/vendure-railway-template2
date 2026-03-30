@@ -1,7 +1,7 @@
 name: Build React Dashboard
 
 on:
-  workflow_dispatch:        # allows manual trigger from GitHub UI
+  workflow_dispatch:
   push:
     branches: [master]
     paths:
@@ -29,6 +29,13 @@ jobs:
         with:
           node-version: 22
           cache: 'npm'
+
+      - name: Cache Vite temp compilation
+        uses: actions/cache@v4
+        with:
+          path: .vendure-dashboard-temp
+          key: vite-temp-${{ hashFiles('src/**', 'package-lock.json') }}
+          restore-keys: vite-temp-
 
       - name: Install dependencies
         run: npm install
