@@ -1,0 +1,1 @@
+import{j as a,c4 as o,l as r,fd as n,m as e}from"./index-fGvXxrc-.js";r({name:e().min(1,"Option group name is required"),values:n(e()).min(1,"At least one option value is required")});r({name:e().min(1,"Option value name is required")});const m=({error:s})=>a.jsx(o,{message:s.message});export{m as errorComponent};
