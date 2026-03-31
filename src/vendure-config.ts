@@ -17,6 +17,12 @@ export const config: VendureConfig = {
         port: +(process.env.PORT || 3000),
         adminApiPath: 'admin-api',
         shopApiPath: 'shop-api',
+        cors: {
+            origin: process.env.STOREFRONT_URL
+                ? process.env.STOREFRONT_URL.split(',').map(u => u.trim())
+                : true,
+            credentials: true,
+        },
           middleware: [
             {
               handler: (_req: any, res: any, next: any) => {

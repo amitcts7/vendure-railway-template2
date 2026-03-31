@@ -3,7 +3,8 @@
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/TalGvY?referralCode=Sjix63&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
 This is a repo which can be used by "one click deploy" features of cloud hosts in order to rapidly set
-up a **Vendure v3.5.5** instance populated with test data, including the new **React Dashboard**.
+up a **Vendure v3.5.5** instance populated with test data, including the new **React Dashboard** and
+the official **[Next.js Storefront](https://github.com/vendurehq/nextjs-starter-vendure)**.
 
 ---
 
@@ -69,12 +70,21 @@ PostgreSQL, asset storage (MinIO / S3 / Railway Volume), worker service, and pub
 
 ## Available endpoints
 
+**Backend service:**
+
 | URL | Description |
 |---|---|
 | `/dashboard` | React Dashboard (admin UI) |
 | `/admin-api` | Admin GraphQL API |
 | `/shop-api` | Storefront GraphQL API |
 | `/assets` | Asset server |
+
+**Storefront service** (separate Railway service from [nextjs-starter-vendure](https://github.com/vendurehq/nextjs-starter-vendure)):
+
+| URL | Description |
+|---|---|
+| `/` | Next.js storefront (product browsing, cart, checkout) |
+| `/account` | Customer account (orders, addresses, profile) |
 
 ## Production (non-Railway)
 
