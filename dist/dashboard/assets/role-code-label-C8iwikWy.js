@@ -1,0 +1,1 @@
+import{bZ as r,j as a,T as E,b_ as R}from"./index-t8kWDkHu.js";function t({code:s}){return s===r?a.jsx(E,{id:"oyKamv"}):s===R?a.jsx(E,{id:"876pfE"}):s}export{t as R};
